@@ -1,7 +1,3 @@
-%{
-    int yylex();
-    void yyerror(const char *s);
-%}
 // Identifiers & numbers 
 %token IDENTIFIER
 %token NUMBER
@@ -274,18 +270,3 @@ ArrayTail
        ;
 
 %%
-
-#include <stdio.h>
-
-extern char yytext[];
-extern int column;
-
-int main(int argc, char **argv){
-    yyparse();
-    return 0;
-}
-
-void yyerror(char const *s){
-	fflush(stdout);
-	printf("\n%*s\n%*s\n", column, "^", column, s);
-}
