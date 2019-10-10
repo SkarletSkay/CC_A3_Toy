@@ -3,3 +3,6 @@
 
 # IntelliJ files
 /.idea
+
+# CMake files
+/cmake-build-*
