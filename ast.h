@@ -1,6 +1,42 @@
 #ifndef TOY_AST_H
 #define TOY_AST_H
 
+typedef enum {
+	STATIC, NONE
+} Staticness;
+
+typedef enum {
+	PUBLIC, PRIVATE, NONE
+} Visibility;
+
+typedef enum {
+	INT, REAL, INT_ARR, REAL_ARR,
+	IDENTIFIER, IDENTIFIER_ARR
+} Type;
+
+typedef enum {
+	INT, REAL, INT_ARR, REAL_ARR,
+	IDENTIFIER, IDENTIFIER_ARR,
+	VOID
+} MethodType;
+
+typedef struct _ParameterList {
+
+} ParameterList;
+
+typedef struct _MethodDeclaration {
+	Visibility visibility;
+	Staticness staticness;
+	MethodType type;
+	const char *identifier;
+	ParameterList parametes;
+	// Body body;
+} MethodDeclaration;
+
+typedef struct _FieldDeclaration {
+
+} FieldDeclaration;
+
 typedef struct _ClassMember {
 
 } ClassMember;
