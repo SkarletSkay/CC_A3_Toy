@@ -2,6 +2,7 @@
 #define TOY_AST_H
 
 #include <stdlib.h>
+#include <string.h>
 
 #define True 1
 #define False 0
@@ -13,9 +14,13 @@ typedef enum _Staticness {
 	STATIC, NONSTATIC
 } Staticness;
 
+Staticness newStaticness(Staticness staticness);
+
 typedef enum _Visibility {
 	PUBLIC, PRIVATE, NONE
 } Visibility;
+
+Visibility newVisibility(Visibility visibility);
 
 typedef enum _Type {
 	INT, REAL, INT_ARR, REAL_ARR,
@@ -23,9 +28,13 @@ typedef enum _Type {
 	VOID
 } Type;
 
+Type newType(Type type);
+
 typedef enum _RelationalOperator {
 	LESS, GREATER, EQUAL, NOT_EQUAL
 } RelationalOperator;
+
+RelationalOperator newRelationalOperator(RelationalOperator relationalOperator);
 
 typedef enum _AddSign {
 	PLUS, MINUS
