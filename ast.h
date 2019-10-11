@@ -27,6 +27,8 @@ typedef enum _MultSign {
 	MULTIPLY, DIVIDE
 } MultSign;
 
+typedef const char *Identifier;
+
 struct _Expression;
 
 typedef struct _NewType {
@@ -47,7 +49,7 @@ typedef struct _Number {
 
 typedef struct _CompoundName {
 	struct _CompoundName *compoundName;
-	const char *identifier;
+	Identifier identifier;
 } CompoundName;
 
 typedef struct _LeftPart {
@@ -85,13 +87,10 @@ typedef struct _Expression {
 	AddSign addSign;
 } Expression;
 
-typedef struct _Statement {
-
-} Statement;
-
-typedef struct _Statements {
-
-} Statements;
+typedef struct _Assignment {
+	LeftPart *leftPart;
+	Expression *expression;
+} Assignment;
 
 typedef struct _Relation {
 	Expression *left;
@@ -99,8 +98,10 @@ typedef struct _Relation {
 	Expression *right;
 } Relation;
 
+struct _Statement;
+
 typedef struct _Block {
-	Statement **statements;
+	struct _Statement **statements;
 } Block;
 
 typedef struct _PrintSatement {
@@ -108,7 +109,8 @@ typedef struct _PrintSatement {
 } PrintStatement;
 
 typedef struct _ArgumentList {
-
+	struct _ArgumentList *argumentList;
+	Expression *expression;
 } ArgumentList;
 
 typedef struct _CallStatement {
@@ -122,27 +124,43 @@ typedef struct _ReturnStatement {
 
 typedef struct _WhileStatement {
 	Relation *relation;
-	Statement *statement;
+	struct _Statement *statement;
 } WhileStatement;
 
 typedef struct _IfStatement {
 	Relation *relation;
-	Statement *ifStatement;
-	Statement *elseStatement;
+	struct _Statement *ifStatement;
+	struct _Statement *elseStatement;
 } IfStatement;
 
-typedef struct _Assignment {
-	LeftPart *leftPart;
-	Expression *expression;
-} Assignment;
+typedef struct _Statement {
+	Assignment *assignment;
+	IfStatement *ifStatement;
+	WhileStatement *whileStatement;
+	ReturnStatement *returnStatement;
+	CallStatement *callStatement;
+	PrintStatement *printStatement;
+	Block *block;
+} Statement;
+
+typedef struct _Statements {
+	struct _Statements *statements;
+	Statement *statement;
+} Statements;
+
+typedef struct _Parameter {
+	Type type;
+	Identifier identifier;
+} Parameter;
 
 typedef struct _ParameterList {
-	const char **list;
+	struct _ParameterList *parameterList;
+	Parameter *parameter;
 } ParameterList;
 
 typedef struct _LocalDeclaration {
 	Type type;
-	const char *identifier;
+	Identifier identifier;
 } LocalDeclaration;
 
 typedef struct _LocalDeclarations {
@@ -152,7 +170,7 @@ typedef struct _LocalDeclarations {
 
 typedef struct _Body {
 	LocalDeclarations *localDeclarations;
-
+	Statements *statements;
 } Body;
 
 typedef struct _MethodDeclaration {
@@ -165,27 +183,32 @@ typedef struct _MethodDeclaration {
 } MethodDeclaration;
 
 typedef struct _FieldDeclaration {
-
+	Visibility visibility;
+	Staticness staticness;
+	Type type;
+	Identifier identifier;
 } FieldDeclaration;
 
 typedef struct _ClassMember {
-
+	FieldDeclaration *fieldDeclaration;
+	MethodDeclaration *methodDeclaration;
 } ClassMember;
 
 typedef struct _ClassMembers {
-
+	struct _ClassMembers *classMembers;
+	ClassMember *classMember;
 } ClassMembers;
 
 typedef struct _ClassBody {
-
+	ClassMembers *classMembers;
 } ClassBody;
 
 typedef struct _Extension {
-
+	Identifier identifier;
 } Extension;
 
 typedef struct _ClassDeclaration {
-
+	
 } ClassDeclaration;
 
 typedef struct _ClassDeclarations {
