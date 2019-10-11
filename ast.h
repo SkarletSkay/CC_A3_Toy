@@ -30,6 +30,18 @@ typedef enum _Type {
 
 Type newType(Type type);
 
+typedef enum _NewType {
+	N_INT, N_REAL, N_IDENTIFIER
+} NewType;
+
+NewType newNewType(NewType newType);
+
+typedef struct _MethodType {
+	Type type;
+} MethodType;
+
+MethodType newMethodType(Type type);
+
 typedef enum _RelationalOperator {
 	LESS, GREATER, EQUAL, NOT_EQUAL
 } RelationalOperator;

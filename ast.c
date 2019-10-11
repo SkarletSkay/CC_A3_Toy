@@ -24,6 +24,16 @@ MultSign newMultSign(MultSign multSign) {
 	return multSign;
 }
 
+NewType newNewType(NewType newType) {
+	return newType;
+}
+
+MethodType newMethodType(Type type) {
+	MethodType result;
+	result.type = type;
+	return result;
+}
+
 CompoundName *newCompoundName(CompoundName *compoundName, Identifier identifier) {
 	CompoundName *result = malloc(sizeof(CompoundName));
 	result->compoundName = compoundName;
