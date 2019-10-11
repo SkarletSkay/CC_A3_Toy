@@ -94,14 +94,10 @@ Relation *newRelation(Expression *left, RelationalOperator relationalOperator, E
 	return result;
 }
 
-Block *9+
-newBlock(Statements
-*statements) {
-Block *result = malloc(sizeof(Block));
-result->
-statements = statements;
-return
-result;
+Block *newBlock(Statements *statements) {
+	Block *result = malloc(sizeof(Block));
+	result->statements = statements;
+	return result;
 }
 
 PrintStatement *newPrintStatement(Expression *expression) {
@@ -160,7 +156,7 @@ Statement *newStatement(Assignment *assignment, IfStatement *ifStatement, WhileS
 }
 
 Statements *newStatements(Statements *statements, Statement *statement) {
-	Statements * result = malloc(sizeof(Statements));
+	Statements *result = malloc(sizeof(Statements));
 	result->statements = statements;
 	result->statement = statement;
 	return result;
@@ -177,6 +173,17 @@ ParameterList *newParameterList(ParameterList *parameterList, Parameter *paramet
 	ParameterList *result = malloc(sizeof(ParameterList));
 	result->parameterList = parameterList;
 	result->parameter = parameter;
+	return result;
+}
+
+Parameters *newParametersNull() {
+	Parameters *result = malloc(sizeof(Parameters));
+	return result;
+}
+
+Parameters *newParameters(ParameterList *parameterList) {
+	Parameters *result = malloc(sizeof(Parameters));
+	result->parameterList = parameterList;
 	return result;
 }
 

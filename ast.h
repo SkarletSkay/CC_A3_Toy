@@ -229,6 +229,15 @@ typedef struct _ParameterList {
 ParameterList *newParameterList(ParameterList *, Parameter *);
 
 
+typedef struct _Parameters {
+	ParameterList *parameterList;
+} Parameters;
+
+Parameters *newParametersNull();
+
+Parameters *newParameters(ParameterList *);
+
+
 typedef struct _LocalDeclaration {
 	Type type;
 	Identifier identifier;
