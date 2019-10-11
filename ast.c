@@ -16,6 +16,14 @@ Staticness newStaticness(Staticness staticness) {
 	return staticness;
 }
 
+AddSign newAddSign(AddSign addSign) {
+	return addSign;
+}
+
+MultSign newMultSign(MultSign multSign) {
+	return multSign;
+}
+
 CompoundName *newCompoundName(CompoundName *compoundName, Identifier identifier) {
 	CompoundName *result = malloc(sizeof(CompoundName));
 	result->compoundName = compoundName;

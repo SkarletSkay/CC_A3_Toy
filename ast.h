@@ -40,9 +40,13 @@ typedef enum _AddSign {
 	PLUS, MINUS
 } AddSign;
 
+AddSign newAddSign(AddSign addSign);
+
 typedef enum _MultSign {
 	MULTIPLY, DIVIDE
 } MultSign;
+
+MultSign newMultSign(MultSign multSign);
 
 struct _Expression;
 
