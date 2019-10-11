@@ -161,7 +161,7 @@ typedef struct _Block {
 Block *newBlock(Statements *);
 
 
-typedef struct _PrintSatement {
+typedef struct _PrintStatement {
 	Expression *expression;
 } PrintStatement;
 
