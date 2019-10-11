@@ -1,10 +1,13 @@
 #ifndef TOY_AST_H
 #define TOY_AST_H
 
+#include <stdlib.h>
+
 #define True 1
 #define False 0
 typedef char bool;
 
+typedef const char *Identifier;
 
 typedef enum _Staticness {
 	STATIC, NONSTATIC
@@ -32,8 +35,6 @@ typedef enum _MultSign {
 	MULTIPLY, DIVIDE
 } MultSign;
 
-typedef const char *Identifier;
-
 struct _Expression;
 
 typedef struct _NewType {
@@ -49,7 +50,6 @@ typedef union _Number {
 	double realVal;
 	int intVal;
 } Number;
-
 
 typedef struct _CompoundName {
 	struct _CompoundName *compoundName;
@@ -74,9 +74,13 @@ typedef struct _Factor {
 	struct _Expression *expression;
 } Factor;
 
+Factor *newFactorNull();
+
 Factor *newFactorNumber(Number);
 
 Factor *newFactorLeftPart(LeftPart *);
+
+Factor *newFactorNewTypeExpression(NewType *, struct _Expression *);
 
 
 typedef struct _Factors {
@@ -151,7 +155,7 @@ typedef struct _Statements {
 } Statements;
 
 typedef struct _Block {
-	Statement **statements;
+	Statements *statements;
 } Block;
 
 Block *newBlock(Statements *);
@@ -214,7 +218,7 @@ typedef struct _Parameter {
 	Identifier identifier;
 } Parameter;
 
-Parameter *newParameter(Type *, Identifier *);
+Parameter *newParameter(Type, Identifier);
 
 
 typedef struct _ParameterList {
@@ -230,7 +234,7 @@ typedef struct _LocalDeclaration {
 	Identifier identifier;
 } LocalDeclaration;
 
-LocalDeclaration *newLocalDeclaration(Type *, Identifier *);
+LocalDeclaration *newLocalDeclaration(Type, Identifier);
 
 
 typedef struct _LocalDeclarations {
@@ -253,13 +257,13 @@ typedef struct _MethodDeclaration {
 	Visibility visibility;
 	Staticness staticness;
 	Type type;
-	const char *identifier;
-	ParameterList *parametes;
+	Identifier identifier;
+	ParameterList *parameterList;
 	Body *body;
 } MethodDeclaration;
 
-MethodDeclaration *newMethodDeclaration(Visibility *, Staticness *,
-                                        Type *, Identifier *,
+MethodDeclaration *newMethodDeclaration(Visibility, Staticness,
+                                        Type, Identifier,
                                         ParameterList *, Body *);
 
 
@@ -270,7 +274,7 @@ typedef struct _FieldDeclaration {
 	Identifier identifier;
 } FieldDeclaration;
 
-FieldDeclaration *newFieldDeclaration(Visibility *, Staticness *, Type *, Identifier *);
+FieldDeclaration *newFieldDeclaration(Visibility, Staticness, Type, Identifier);
 
 
 typedef struct _ClassMember {
@@ -339,8 +343,8 @@ Imports *newImports(Imports *, Import *);
 
 
 typedef struct _CompilationUnit {
-	Imports imports;
-	ClassDeclarations classDeclarations;
+	Imports *imports;
+	ClassDeclarations *classDeclarations;
 } CompilationUnit;
 
 CompilationUnit *newCompilationUnit(Imports *, ClassDeclarations *);
