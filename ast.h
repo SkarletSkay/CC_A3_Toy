@@ -1,6 +1,11 @@
 #ifndef TOY_AST_H
 #define TOY_AST_H
 
+#define True 1
+#define False 0
+typedef char bool;
+
+
 typedef enum _Staticness {
 	STATIC, NONSTATIC
 } Staticness;
@@ -40,29 +45,39 @@ typedef struct _NewType {
 	};
 } NewType;
 
-typedef struct _Number {
-	union {
-		double realVal;
-		int intVal;
-	};
+typedef union _Number {
+	double realVal;
+	int intVal;
 } Number;
+
 
 typedef struct _CompoundName {
 	struct _CompoundName *compoundName;
 	Identifier identifier;
 } CompoundName;
 
+CompoundName *newCompoundName(CompoundName *, Identifier);
+
+
 typedef struct _LeftPart {
 	CompoundName *compoundName;
 	struct _Expression *expression;
 } LeftPart;
 
+LeftPart *newLeftPart(CompoundName *, struct _Expression *);
+
+
 typedef struct _Factor {
-	Number *number;
+	Number number;
 	LeftPart *leftPart;
 	NewType *newType;
 	struct _Expression *expression;
 } Factor;
+
+Factor *newFactorNumber(Number);
+
+Factor *newFactorLeftPart(LeftPart *);
+
 
 typedef struct _Factors {
 	MultSign multSign;
@@ -70,10 +85,18 @@ typedef struct _Factors {
 	struct _Factors *factors;
 } Factors;
 
+Factors *newFactorsNull();
+
+Factors *newFactors(MultSign, Factor *, Factors *);
+
+
 typedef struct _Term {
 	Factor *factor;
 	Factors *factors;
 } Term;
+
+Term *newTerm(Factor *, Factors *);
+
 
 typedef struct _Terms {
 	AddSign addSign;
@@ -81,16 +104,27 @@ typedef struct _Terms {
 	struct _Terms *terms;
 } Terms;
 
+Terms *newTermsNull();
+
+Terms *newTerms(AddSign, Term *, Terms *);
+
+
 typedef struct _Expression {
 	Term *term;
 	Terms *terms;
 	AddSign addSign;
 } Expression;
 
+Expression *newExpression(Term *, Terms *, AddSign);
+
+
 typedef struct _Assignment {
 	LeftPart *leftPart;
 	Expression *expression;
 } Assignment;
+
+Assignment *newAssignment(LeftPart *, Expression *);
+
 
 typedef struct _Relation {
 	Expression *left;
@@ -98,49 +132,17 @@ typedef struct _Relation {
 	Expression *right;
 } Relation;
 
-struct _Statement;
+Relation *newRelation(Expression *, RelationalOperator, Expression *);
 
-typedef struct _Block {
-	struct _Statement **statements;
-} Block;
-
-typedef struct _PrintSatement {
-	Expression *expression;
-} PrintStatement;
-
-typedef struct _ArgumentList {
-	Expression *expression;
-	struct _ArgumentList *argumentList;
-} ArgumentList;
-
-typedef struct _CallStatement {
-	CompoundName *compoundName;
-	ArgumentList *argumentList;
-} CallStatement;
-
-typedef struct _ReturnStatement {
-	Expression *expression;
-} ReturnStatement;
-
-typedef struct _WhileStatement {
-	Relation *relation;
-	struct _Statement *statement;
-} WhileStatement;
-
-typedef struct _IfStatement {
-	Relation *relation;
-	struct _Statement *ifStatement;
-	struct _Statement *elseStatement;
-} IfStatement;
 
 typedef struct _Statement {
-	Assignment *assignment;
-	IfStatement *ifStatement;
-	WhileStatement *whileStatement;
-	ReturnStatement *returnStatement;
-	CallStatement *callStatement;
-	PrintStatement *printStatement;
-	Block *block;
+	struct _Assignment *assignment;
+	struct _IfStatement *ifStatement;
+	struct _WhileStatement *whileStatement;
+	struct _ReturnStatement *returnStatement;
+	struct _CallStatement *callStatement;
+	struct _PrintStatement *printStatement;
+	struct _Block *block;
 } Statement;
 
 typedef struct _Statements {
@@ -148,30 +150,104 @@ typedef struct _Statements {
 	struct _Statements *statements;
 } Statements;
 
+typedef struct _Block {
+	Statement **statements;
+} Block;
+
+Block *newBlock(Statements *);
+
+
+typedef struct _PrintSatement {
+	Expression *expression;
+} PrintStatement;
+
+PrintStatement *newPrintStatement(Expression *);
+
+
+typedef struct _ArgumentList {
+	Expression *expression;
+	struct _ArgumentList *argumentList;
+} ArgumentList;
+
+ArgumentList *newArgumentList(ArgumentList *, Expression *);
+
+
+typedef struct _CallStatement {
+	CompoundName *compoundName;
+	ArgumentList *argumentList;
+} CallStatement;
+
+CallStatement *newCallStatement(CompoundName *, ArgumentList *);
+
+
+typedef struct _ReturnStatement {
+	Expression *expression;
+} ReturnStatement;
+
+ReturnStatement *newReturnStatement(Expression *);
+
+typedef struct _WhileStatement {
+	Relation *relation;
+	Statement *statement;
+} WhileStatement;
+
+WhileStatement *newWhileStatement(Relation *, Statement *);
+
+
+typedef struct _IfStatement {
+	Relation *relation;
+	Statement *ifStatement;
+	Statement *elseStatement;
+} IfStatement;
+
+IfStatement *newIfStatement(Relation *, Statement *, Statement *);
+
+Statement *newStatement(Assignment *, IfStatement *,
+                        WhileStatement *, ReturnStatement *,
+                        CallStatement *, PrintStatement *, Block *);
+
+Statements *newStatements(Statements *, Statement *);
+
+
 typedef struct _Parameter {
 	Type type;
 	Identifier identifier;
 } Parameter;
+
+Parameter *newParameter(Type *, Identifier *);
+
 
 typedef struct _ParameterList {
 	Parameter *parameter;
 	struct _ParameterList *parameterList;
 } ParameterList;
 
+ParameterList *newParameterList(ParameterList *, Parameter *);
+
+
 typedef struct _LocalDeclaration {
 	Type type;
 	Identifier identifier;
 } LocalDeclaration;
+
+LocalDeclaration *newLocalDeclaration(Type *, Identifier *);
+
 
 typedef struct _LocalDeclarations {
 	LocalDeclaration *localDeclaration;
 	struct _LocalDeclarations *localDeclarations;
 } LocalDeclarations;
 
+LocalDeclarations *newLocalDeclarations(LocalDeclarations *, LocalDeclaration *);
+
+
 typedef struct _Body {
 	LocalDeclarations *localDeclarations;
 	Statements *statements;
 } Body;
+
+Body *newBody(LocalDeclarations *, Statements *);
+
 
 typedef struct _MethodDeclaration {
 	Visibility visibility;
@@ -182,6 +258,11 @@ typedef struct _MethodDeclaration {
 	Body *body;
 } MethodDeclaration;
 
+MethodDeclaration *newMethodDeclaration(Visibility *, Staticness *,
+                                        Type *, Identifier *,
+                                        ParameterList *, Body *);
+
+
 typedef struct _FieldDeclaration {
 	Visibility visibility;
 	Staticness staticness;
@@ -189,49 +270,80 @@ typedef struct _FieldDeclaration {
 	Identifier identifier;
 } FieldDeclaration;
 
+FieldDeclaration *newFieldDeclaration(Visibility *, Staticness *, Type *, Identifier *);
+
+
 typedef struct _ClassMember {
 	FieldDeclaration *fieldDeclaration;
 	MethodDeclaration *methodDeclaration;
 } ClassMember;
+
+ClassMember *newClassMemberField(FieldDeclaration *);
+
+ClassMember *newClassMemberMethod(MethodDeclaration *);
+
 
 typedef struct _ClassMembers {
 	ClassMember *classMember;
 	struct _ClassMembers *classMembers;
 } ClassMembers;
 
+ClassMembers *newClassMembers(ClassMembers *, ClassMember *);
+
+
 typedef struct _ClassBody {
 	ClassMembers *classMembers;
 } ClassBody;
+
+ClassBody *newClassBody(ClassMembers *);
+
 
 typedef struct _Extension {
 	Identifier identifier;
 } Extension;
 
+Extension *newExtension(Identifier);
+
+
 typedef struct _ClassDeclaration {
-	char isPublic;
+	bool isPublic;
 	CompoundName *compoundName;
 	Extension *extension;
 	ClassBody *classBody;
 } ClassDeclaration;
+
+ClassDeclaration *newClassDeclaration(bool, CompoundName *, Extension *, ClassBody *);
+
 
 typedef struct _ClassDeclarations {
 	ClassDeclaration *classDeclaration;
 	struct _ClassDeclarations *classDeclarations;
 } ClassDeclarations;
 
+ClassDeclarations *newClassDeclarations(ClassDeclarations *, ClassDeclaration *);
+
+
 typedef struct _Import {
 	Identifier identifier;
 } Import;
+
+Import *newImport(Identifier);
+
 
 typedef struct _Imports {
 	Import *anImport;
 	struct _Imports *imports;
 } Imports;
 
+Imports *newImports(Imports *, Import *);
+
+
 typedef struct _CompilationUnit {
 	Imports imports;
 	ClassDeclarations classDeclarations;
 } CompilationUnit;
+
+CompilationUnit *newCompilationUnit(Imports *, ClassDeclarations *);
 
 
 #endif // TOY_AST_H
