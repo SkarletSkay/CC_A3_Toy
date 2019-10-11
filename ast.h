@@ -109,8 +109,8 @@ typedef struct _PrintSatement {
 } PrintStatement;
 
 typedef struct _ArgumentList {
-	struct _ArgumentList *argumentList;
 	Expression *expression;
+	struct _ArgumentList *argumentList;
 } ArgumentList;
 
 typedef struct _CallStatement {
@@ -144,8 +144,8 @@ typedef struct _Statement {
 } Statement;
 
 typedef struct _Statements {
-	struct _Statements *statements;
 	Statement *statement;
+	struct _Statements *statements;
 } Statements;
 
 typedef struct _Parameter {
@@ -154,8 +154,8 @@ typedef struct _Parameter {
 } Parameter;
 
 typedef struct _ParameterList {
-	struct _ParameterList *parameterList;
 	Parameter *parameter;
+	struct _ParameterList *parameterList;
 } ParameterList;
 
 typedef struct _LocalDeclaration {
@@ -195,8 +195,8 @@ typedef struct _ClassMember {
 } ClassMember;
 
 typedef struct _ClassMembers {
-	struct _ClassMembers *classMembers;
 	ClassMember *classMember;
+	struct _ClassMembers *classMembers;
 } ClassMembers;
 
 typedef struct _ClassBody {
@@ -208,19 +208,24 @@ typedef struct _Extension {
 } Extension;
 
 typedef struct _ClassDeclaration {
-	
+	char isPublic;
+	CompoundName *compoundName;
+	Extension *extension;
+	ClassBody *classBody;
 } ClassDeclaration;
 
 typedef struct _ClassDeclarations {
-
+	ClassDeclaration *classDeclaration;
+	struct _ClassDeclarations *classDeclarations;
 } ClassDeclarations;
 
 typedef struct _Import {
-
+	Identifier identifier;
 } Import;
 
 typedef struct _Imports {
-
+	Import *anImport;
+	struct _Imports *imports;
 } Imports;
 
 typedef struct _CompilationUnit {
