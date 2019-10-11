@@ -1,5 +1,21 @@
 #include "ast.h"
 
+RelationalOperator newRelationalOperator(RelationalOperator relationalOperator) {
+	return relationalOperator;
+}
+
+Type newType(Type type) {
+	return type;
+}
+
+Visibility newVisibility(Visibility visibility) {
+	return visibility;
+}
+
+Staticness newStaticness(Staticness staticness) {
+	return staticness;
+}
+
 CompoundName *newCompoundName(CompoundName *compoundName, Identifier identifier) {
 	CompoundName *result = malloc(sizeof(CompoundName));
 	result->compoundName = compoundName;
