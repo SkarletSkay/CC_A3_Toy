@@ -3,85 +3,129 @@
 
 #include <stdlib.h>
 #include <string.h>
+#include <stdio.h>
 
 #define True 1
 #define False 0
 typedef char bool;
 
-typedef const char *Identifier;
+typedef const char* Identifier;
+typedef double Number;
 
-typedef enum _Staticness {
-	STATIC, NONSTATIC
+typedef struct _ArrayTail {
+	bool is;
+} ArrayTail;
+
+ArrayTail* newArrayTail(bool);
+
+typedef struct _IDVal {
+	char* val;
+} IDVal;
+
+typedef struct _NumVal {
+	double val;
+} NumVal;
+
+IDVal* newID(Identifier);
+
+NumVal* newNumber(Number);
+
+typedef enum _Staticness_en {
+	STATIC_T, NONSTATIC_T
+} Staticness_en;
+
+typedef struct _Staticness {
+	Staticness_en staticness;
 } Staticness;
 
-Staticness newStaticness(Staticness staticness);
+Staticness* newStaticness(Staticness_en staticness);
 
-typedef enum _Visibility {
-	PUBLIC, PRIVATE, NONE
+typedef enum _Visibility_en {
+	PUBLIC_T, PRIVATE_T, NONE
+} Visibility_en;
+
+
+typedef struct _Visibility {
+	Visibility_en visibility;
 } Visibility;
 
-Visibility newVisibility(Visibility visibility);
+Visibility* newVisibility(Visibility_en visibility);
 
-typedef enum _Type {
-	INT, REAL, INT_ARR, REAL_ARR,
-	IDENTIFIER, IDENTIFIER_ARR,
-	VOID
+typedef enum _Type_en {
+	INT_T, REAL_T, INT_ARR, REAL_ARR,
+	IDENTIFIER_T, IDENTIFIER_ARR,
+	VOID_T
+} Type_en;
+
+typedef struct _Type {
+	IDVal* identifier;
+	Type_en type;
+  ArrayTail* arrayTail;
 } Type;
 
-Type newType(Type type);
+Type* newType(Type_en type, IDVal*, ArrayTail*);
 
-typedef enum _NewType {
-	N_INT, N_REAL, N_IDENTIFIER
+typedef struct _NewType {
+	IDVal* identifier;
+	Type_en type;
 } NewType;
 
-NewType newNewType(NewType newType);
+typedef enum _NewTypeEn {
+	N_INT, N_REAL, N_IDENTIFIER
+} NewTypeEn;
+
+NewType* newNewType(Type_en type, IDVal*);
 
 typedef struct _MethodType {
-	Type type;
+	Type* type;
 } MethodType;
 
-MethodType newMethodType(Type type);
+MethodType* newMethodType(Type* type);
+MethodType* newMethodTypeVoid(Type_en type);
 
-typedef enum _RelationalOperator {
-	LESS, GREATER, EQUAL, NOT_EQUAL
+typedef enum _RelationalOperator_en {
+	LESS_T, GREATER_T, EQUAL_T, NOT_EQUAL_T
+} RelationalOperator_en;
+
+
+typedef struct _RelationalOperator {
+	RelationalOperator_en relationalOperator;
 } RelationalOperator;
 
-RelationalOperator newRelationalOperator(RelationalOperator relationalOperator);
+RelationalOperator* newRelationalOperator(RelationalOperator_en relationalOperator);
 
-typedef enum _AddSign {
-	PLUS, MINUS
+typedef enum _AddSign_en {
+	PLUS_T, MINUS_T
+} AddSign_en;
+
+
+typedef struct _AddSign{
+	AddSign_en addSign;
 } AddSign;
 
-AddSign newAddSign(AddSign addSign);
 
-typedef enum _MultSign {
-	MULTIPLY, DIVIDE
+AddSign* newAddSign(AddSign_en addSign);
+
+typedef enum _MultSign_en {
+	MULTIPLY_T, DIVIDE_T
+} MultSign_en;
+
+typedef struct _MultSign{
+	MultSign_en multSign;
 } MultSign;
 
-MultSign newMultSign(MultSign multSign);
+
+MultSign* newMultSign(MultSign_en multSign);
 
 struct _Expression;
 
-typedef struct _NewType {
-	const char *identifier;
-	Type type;
-	union {
-		double realVal;
-		int intVal;
-	};
-} NewType;
-
-typedef union _Number {
-	double realVal;
-	int intVal;
-} Number;
 
 typedef struct _CompoundName {
 	struct _CompoundName *compoundName;
-	Identifier identifier;
+	IDVal* identifier;
 } CompoundName;
 
-CompoundName *newCompoundName(CompoundName *, Identifier);
+CompoundName *newCompoundName(CompoundName *, IDVal*);
 
 
 typedef struct _LeftPart {
@@ -93,15 +137,16 @@ LeftPart *newLeftPart(CompoundName *, struct _Expression *);
 
 
 typedef struct _Factor {
-	Number number;
+	NumVal* number;
 	LeftPart *leftPart;
 	NewType *newType;
 	struct _Expression *expression;
+  bool isNull;
 } Factor;
 
 Factor *newFactorNull();
 
-Factor *newFactorNumber(Number);
+Factor *newFactorNumber(NumVal*);
 
 Factor *newFactorLeftPart(LeftPart *);
 
@@ -109,14 +154,14 @@ Factor *newFactorNewTypeExpression(NewType *, struct _Expression *);
 
 
 typedef struct _Factors {
-	MultSign multSign;
+	MultSign* multSign;
 	Factor *factor;
 	struct _Factors *factors;
 } Factors;
 
 Factors *newFactorsNull();
 
-Factors *newFactors(MultSign, Factor *, Factors *);
+Factors *newFactors(MultSign*, Factor *, Factors *);
 
 
 typedef struct _Term {
@@ -128,23 +173,23 @@ Term *newTerm(Factor *, Factors *);
 
 
 typedef struct _Terms {
-	AddSign addSign;
+	AddSign* addSign;
 	Term *term;
 	struct _Terms *terms;
 } Terms;
 
 Terms *newTermsNull();
 
-Terms *newTerms(AddSign, Term *, Terms *);
+Terms *newTerms(AddSign*, Term *, Terms *);
 
 
 typedef struct _Expression {
 	Term *term;
 	Terms *terms;
-	AddSign addSign;
+	AddSign* addSign;
 } Expression;
 
-Expression *newExpression(Term *, Terms *, AddSign);
+Expression *newExpression(Term *, Terms *, AddSign*);
 
 
 typedef struct _Assignment {
@@ -157,11 +202,11 @@ Assignment *newAssignment(LeftPart *, Expression *);
 
 typedef struct _Relation {
 	Expression *left;
-	RelationalOperator oper;
+	RelationalOperator* oper;
 	Expression *right;
 } Relation;
 
-Relation *newRelation(Expression *, RelationalOperator, Expression *);
+Relation *newRelation(Expression *, RelationalOperator*, Expression *);
 
 
 typedef struct _Statement {
@@ -239,11 +284,11 @@ Statements *newStatements(Statements *, Statement *);
 
 
 typedef struct _Parameter {
-	Type type;
-	Identifier identifier;
+	Type* type;
+	IDVal* identifier;
 } Parameter;
 
-Parameter *newParameter(Type, Identifier);
+Parameter *newParameter(Type*, IDVal*);
 
 
 typedef struct _ParameterList {
@@ -264,11 +309,11 @@ Parameters *newParameters(ParameterList *);
 
 
 typedef struct _LocalDeclaration {
-	Type type;
-	Identifier identifier;
+	Type* type;
+	IDVal* identifier;
 } LocalDeclaration;
 
-LocalDeclaration *newLocalDeclaration(Type, Identifier);
+LocalDeclaration *newLocalDeclaration(Type*, IDVal*);
 
 
 typedef struct _LocalDeclarations {
@@ -288,27 +333,27 @@ Body *newBody(LocalDeclarations *, Statements *);
 
 
 typedef struct _MethodDeclaration {
-	Visibility visibility;
-	Staticness staticness;
-	Type type;
-	Identifier identifier;
-	ParameterList *parameterList;
+	Visibility* visibility;
+	Staticness* staticness;
+	MethodType* type;
+	IDVal* identifier;
+	Parameters *parameters;
 	Body *body;
 } MethodDeclaration;
 
-MethodDeclaration *newMethodDeclaration(Visibility, Staticness,
-                                        Type, Identifier,
-                                        ParameterList *, Body *);
+MethodDeclaration *newMethodDeclaration(Visibility*, Staticness*,
+                                        MethodType*, IDVal*,
+                                        Parameters*, Body *);
 
 
 typedef struct _FieldDeclaration {
-	Visibility visibility;
-	Staticness staticness;
-	Type type;
-	Identifier identifier;
+	Visibility* visibility;
+	Staticness* staticness;
+	Type* type;
+	IDVal* identifier;
 } FieldDeclaration;
 
-FieldDeclaration *newFieldDeclaration(Visibility, Staticness, Type, Identifier);
+FieldDeclaration *newFieldDeclaration(Visibility*, Staticness*, Type*, IDVal*);
 
 
 typedef struct _ClassMember {
@@ -337,10 +382,10 @@ ClassBody *newClassBody(ClassMembers *);
 
 
 typedef struct _Extension {
-	Identifier identifier;
+	IDVal* identifier;
 } Extension;
 
-Extension *newExtension(Identifier);
+Extension *newExtension(IDVal*);
 
 
 typedef struct _ClassDeclaration {
@@ -362,10 +407,10 @@ ClassDeclarations *newClassDeclarations(ClassDeclarations *, ClassDeclaration *)
 
 
 typedef struct _Import {
-	Identifier identifier;
+	IDVal* identifier;
 } Import;
 
-Import *newImport(Identifier);
+Import *newImport(IDVal*);
 
 
 typedef struct _Imports {
@@ -381,7 +426,19 @@ typedef struct _CompilationUnit {
 	ClassDeclarations *classDeclarations;
 } CompilationUnit;
 
-CompilationUnit *newCompilationUnit(Imports *, ClassDeclarations *);
 
+CompilationUnit *newCompilationUnit(Imports *, ClassDeclarations *);
+typedef struct {
+	FILE          *src;
+	CompilationUnit *root;
+} root_node;
+
+void print_compilation_unit(CompilationUnit* node, int n);
+
+void print_statement(Statement* node, int n);
+
+void print_statements(Statements* node, int n);
+
+void print_expression(Expression* node, int n);
 
 #endif // TOY_AST_H

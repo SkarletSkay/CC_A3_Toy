@@ -2,8 +2,6 @@
 #include "lex.h"
 #include "ast.h"
 #include <stdio.h>
-
-
 int
 main(int argc, char **argv) 
 {
@@ -16,15 +14,8 @@ main(int argc, char **argv)
 	yyset_in(r->src, sc);
 	int number = yyparse(sc, r);
 	yylex_destroy(sc);
-
-	if (number == 0) {
-		print_node_sexp(r->root);
-	}
-
-  if (r->root != NULL) {
-		delete_sexp_node(r->root);
-	}
+  
+  print_compilation_unit(r->root, 0);
 	fclose(r->src);
-	free(r);
 	return 0;
 }

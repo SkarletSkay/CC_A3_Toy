@@ -20,7 +20,7 @@ void yyerror (yyscan_t *locp, root_node *r, char const *msg);
 }
 
 %define api.value.type union
-%token <long>           NUMBER     "number"
+%token <double>           NUMBER     "number"
 %token <const char *>   IDENTIFIER "identifier"
 
 %token TOK_EOF 0 "end of file"
@@ -95,23 +95,23 @@ void yyerror (yyscan_t *locp, root_node *r, char const *msg);
 %type <WhileStatement*> WhileStatement
 %type <ReturnStatement*> ReturnStatement
 %type <CallStatement*> CallStatement
-%type <ReturnStatement*> ReturnStatement
 %type <ArgumentList*> ArgumentList
-%type <ReturnStatement*> ReturnStatement
 %type <PrintStatement*> PrintStatement
 %type <Block*> Block
 %type <Relation*> Relation
-%type <RelationOperator*> RelationalOperator
+%type <RelationalOperator*> RelationalOperator
 %type <Expression*> Expression
 %type <AddSign*> AddSign
 %type <Terms*> Terms
 %type <Term*> Term
 %type <Factors*> Factors
-%type <MultSignr*> MultSign
+%type <MultSign*> MultSign
 %type <Factor*> Factor
 %type <NewType*> NewType
 %type <Type*> Type
 %type <ArrayTail*> ArrayTail
+%type <IDVal*> Id
+%type <NumVal*> Num
 %%
 
 %start CompilationUnit;
@@ -127,22 +127,22 @@ Imports
        ;
 
 Import
-       : IMPORT IDENTIFIER SEMICOLON { $$ = newImport($2); }
+       : IMPORT Id SEMICOLON {$$ = newImport($2);  }
        ;
 
 ClassDeclarations
        : /* empty */ { $$ = NULL; }
-       | ClassDeclaration ClassDeclarations {$$ = newClassDeclarations($2, $1); }
+       | ClassDeclaration ClassDeclarations {$$ = newClassDeclarations($2, $1);}
        ;
 
 ClassDeclaration
        : CLASS CompoundName Extension SEMICOLON ClassBody {$$ = newClassDeclaration(0, $2, $3, $5); }
-       | PUBLIC CLASS CompoundName Extension SEMICOLON ClassBody {$$ = newClassDeclaration(1 , $2, $3, $5); }
+       | PUBLIC CLASS CompoundName Extension SEMICOLON ClassBody {$$ = newClassDeclaration(1 , $3, $4, $6); }
        ;
 
 Extension
        : /* empty */ {$$ = NULL; } 
-       | EXTENDS IDENTIFIER {$$ = newExtension($2); }
+       | EXTENDS Id {$$ = newExtension($2); }
        ;
 
 ClassBody
@@ -151,7 +151,7 @@ ClassBody
        ;
 
 ClassMembers
-       :              ClassMember {$$ = newСlassMembers(NULL, $1); }
+       :              ClassMember {$$ = newClassMembers(NULL, $1); }
        | ClassMembers ClassMember {$$ = newClassMembers($1, $2); }
        ;
 
@@ -160,47 +160,47 @@ ClassMember
        | MethodDeclaration {$$ = newClassMemberMethod($1); }
        ;
 
+MethodDeclaration
+       : Visibility Staticness MethodType Id Parameters
+            Body {$$ = newMethodDeclaration($1, $2, $3, $4, $5, $6); }
+       ;
+
 FieldDeclaration
-       : Visibility Staticness Type IDENTIFIER SEMICOLON {$$ = newFieldDeclaration($1, $2, $3, $4); }
+       : Visibility Staticness Type Id SEMICOLON {$$ = newFieldDeclaration($1, $2, $3, $4); }
        ;
 
 Visibility
-       : /* empty */ {$$ = newVisibility(NULL); }
-       | PRIVATE  {$$ = newVisibility(PRIVATE); }
-       | PUBLIC {$$ = newVisibility(PUBLIC); }
+       : /* empty */ {$$ = newVisibility(NONE); }
+       | PRIVATE  {$$ = newVisibility(PRIVATE_T); }
+       | PUBLIC {$$ = newVisibility(PUBLIC_T); }
        ;
 
 Staticness
-       : /* empty */ {$$ = NULL; }
-       | STATIC {$$ = newStaticness($1); }
-       ;
-
-MethodDeclaration
-       : Visibility Staticness MethodType IDENTIFIER Parameters
-            Body {$$ = newMethodDeclaration($1, $2, $3, $4, $5; $6); }
+       : /* empty */ {$$ =newStaticness(NONSTATIC_T); }
+       | STATIC {$$ = newStaticness(STATIC_T); }
        ;
 
 Parameters
        : LPAREN               RPAREN {$$ = newParameters(NULL); }
-       | LPAREN ParameterList RPAREN {$$ = newParameters($1); }
+       | LPAREN ParameterList RPAREN {$$ = newParameters($2); }
        ;
 
 ParameterList
        :                     Parameter {$$ = newParameterList(NULL, $1); }
-       | ParameterList COMMA Parameter {$$ = newParameterList($1, $2); }
+       | ParameterList COMMA Parameter {$$ = newParameterList($1, $3); }
        ;
 
 Parameter
-       : Type IDENTIFIER  {$$ = newParameter($1, $2); }
+       : Type Id  {$$ = newParameter($1, $2); }
        ;
 
 MethodType
        : Type {$$ = newMethodType($1); }
-       | VOID {$$ = newMethodType(VOID); }
+       | VOID {$$ = newMethodTypeVoid(VOID_T); }
        ;
 
 Body
-       : LBRACE LocalDeclarations Statements RBRACE {$$ = newBody($1, $2); }
+       : LBRACE LocalDeclarations Statements RBRACE {$$ = newBody($2, $3); }
        ;
 
 LocalDeclarations
@@ -209,7 +209,7 @@ LocalDeclarations
        ;
 
 LocalDeclaration
-       : Type IDENTIFIER SEMICOLON {$$ = newLocalDeclaration($1, $2); }
+       : Type Id SEMICOLON {$$ = newLocalDeclaration($1, $2); }
        ;
 
 Statements
@@ -219,7 +219,7 @@ Statements
 
 Statement
        : Assignment {$$ = newStatement($1, NULL, NULL, NULL, NULL, NULL, NULL); }
-       | IfStatement {$$ = newStatement(NULL, $1, NULL, NULL, NULL, NULL, NULL,); }
+       | IfStatement {$$ = newStatement(NULL, $1, NULL, NULL, NULL, NULL, NULL); }
        | WhileStatement {$$ = newStatement(NULL, NULL, $1, NULL, NULL, NULL, NULL); }
        | ReturnStatement {$$ = newStatement(NULL, NULL, NULL, $1, NULL, NULL, NULL); }
        | CallStatement {$$ = newStatement(NULL, NULL, NULL, NULL, $1, NULL, NULL); }
@@ -233,45 +233,45 @@ Assignment
 
 LeftPart
        : CompoundName                               {$$ = newLeftPart($1, NULL); }
-       | CompoundName LBRACKET Expression RBRACKET  {$$ = newLeftPart($1, $2); }
+       | CompoundName LBRACKET Expression RBRACKET  {$$ = newLeftPart($1, $3); }
        ;
 
 CompoundName
-       :                  IDENTIFIER {$$ =newCompoundName( NULL,$1); }
-       | CompoundName DOT IDENTIFIER {$$ = newCompoundName($1, $2); }
+       :                  Id {$$ =newCompoundName( NULL,$1); }
+       | CompoundName DOT Id {$$ = newCompoundName($1, $3); }
        ;
 
 IfStatement
-       : IF LPAREN Relation RPAREN Statement                  {$$ = newIfStatement($1, $2, NULL); }
-       | IF LPAREN Relation RPAREN Statement ELSE Statement   {$$ = newIfStatement($1, $2, $3); }
+       : IF LPAREN Relation RPAREN Statement                  {$$ = newIfStatement($3, $5, NULL); }
+       | IF LPAREN Relation RPAREN Statement ELSE Statement   {$$ = newIfStatement($3, $5, $7); }
        ;
 
 WhileStatement
-       : WHILE Relation LOOP Statement SEMICOLON {$$ = newWhileStatement($1, $2); }
+       : WHILE Relation LOOP Statement SEMICOLON {$$ = newWhileStatement($2, $4); }
        ;
 
 ReturnStatement
        : RETURN            SEMICOLON  {$$ = newReturnStatement(NULL); }
-       | RETURN Expression SEMICOLON  {$$ = newReturnStatement($1); }
+       | RETURN Expression SEMICOLON  {$$ = newReturnStatement($2); }
        ;
 
 CallStatement
        : CompoundName LPAREN              RPAREN SEMICOLON  {$$ = newCallStatement($1, NULL); }
-       | CompoundName LPAREN ArgumentList RPAREN SEMICOLON  {$$ = newCallStatement($1, $2); }
+       | CompoundName LPAREN ArgumentList RPAREN SEMICOLON  {$$ = newCallStatement($1, $3); }
        ;
 
 ArgumentList
        :                    Expression  {$$ = newArgumentList(NULL, $1); }
-       | ArgumentList COMMA Expression  {$$ = newArgumentList($1, $2); }
+       | ArgumentList COMMA Expression  {$$ = newArgumentList($1, $3); }
        ;
 
 PrintStatement
-       : PRINT Expression SEMICOLON  {$$ = newPrintStatement($1); }
+       : PRINT Expression SEMICOLON  {$$ = newPrintStatement($2); }
        ;
 
 Block
        : LBRACE            RBRACE {$$ = newBlock(NULL); }
-       | LBRACE Statements RBRACE {$$ = newBlock($1); }
+       | LBRACE Statements RBRACE {$$ = newBlock($2); }
        ;
 
 Relation
@@ -280,10 +280,10 @@ Relation
        ;
 
 RelationalOperator
-       : LESS       {$$ = newRelationOperator(LESS); }
-       | GREATER    {$$ = newRelationOperator(GREATER); }
-       | EQUAL      {$$ = newRelationOperator(EQUAL); }
-       | NOT_EQUAL  {$$ = newRelationOperator(NOT_EQUAL); }
+       : LESS       {$$ = newRelationalOperator(LESS_T); }
+       | GREATER    {$$ = newRelationalOperator(GREATER_T); }
+       | EQUAL      {$$ = newRelationalOperator(EQUAL_T); }
+       | NOT_EQUAL  {$$ = newRelationalOperator(NOT_EQUAL_T); }
        ;
 
 Expression
@@ -292,8 +292,8 @@ Expression
        ;
 
 AddSign
-       : PLUS     {$$ = newAddSign(PLUS); }
-       | MINUS    {$$ = newAddSign(MINUS); }
+       : PLUS     {$$ = newAddSign(PLUS_T); }
+       | MINUS    {$$ = newAddSign(MINUS_T); }
        ;
 
 Terms
@@ -311,34 +311,43 @@ Factors
        ;
 
 MultSign
-       : MULTIPLY   {$$ = newMultiSign(MULTIPLY); }
-       | DIVIDE     {$$ = newMultiSign(DIVIDE); }
+       : MULTIPLY   {$$ = newMultSign(MULTIPLY_T); }
+       | DIVIDE     {$$ = newMultSign(DIVIDE_T); }
        ;
 
 Factor
-       : NUMBER                                       {$$ = new_factor($1, NULL); }
-       | LeftPart                                     {$$ = new_factor($1, NULL); }
-       | NULLVAL                                      {$$ = new_factor(NULLVALL); }
-       | NEW NewType                                  {$$ = new_factor($1, NULL); }
-       | NEW NewType LBRACKET Expression RBRACKET     {$$ = new_factor($1, $2); }
+       : Num                                          {$$ = newFactorNumber($1); }
+       | LeftPart                                     {$$ = newFactorLeftPart($1); }
+       | NULLVAL                                      {$$ = newFactorNull(NULL); }
+       | NEW NewType                                  {$$ = newFactorNewTypeExpression($2, NULL); }
+       | NEW NewType LBRACKET Expression RBRACKET     {$$ = newFactorNewTypeExpression($2, $4); }
        ;
 
 NewType
-       : INT          {$$ = newNewType(INT, $1); }
-       | REAL         {$$ = newNewType(REAL, $1); }
-       | IDENTIFIER   {$$ = newNewType(IDENTIFIER, $1); }
+       : INT          {$$ = newNewType(INT_T, NULL); }
+       | REAL         {$$ = newNewType(REAL_T, NULL); }
+       | Id         {$$ = newNewType(IDENTIFIER_T, $1); }
        ;
 
 Type
-       : INT        ArrayTail  {$$ = newType(INT, $1); }
-       | REAL       ArrayTail  {$$ = newType(REAL, $1); }
-       | IDENTIFIER ArrayTail  {$$ = newType(IDENTIFIER, $1); }
+       : INT        ArrayTail  {$$ = newType(INT_T, NULL, $2); }
+       | REAL       ArrayTail  {$$ = newType(REAL_T, NULL, $2); }
+       | Id ArrayTail  {$$ = newType(IDENTIFIER_T, $1, $2);}
        ;
 
 ArrayTail
-       : /* empty */       {$$ = NULL; 
-       | LBRACKET RBRACKET {$$ = newArrayTail(ARRAYTAIL); 
+       : /* empty */       {$$ = NULL; }
+       | LBRACKET RBRACKET {$$ = newArrayTail(1);} 
        ;
+
+Id
+  : "identifier"  {$$ = newID($1); }
+  ;
+
+Num
+  : "number"  {$$ = newNumber($1); }
+  ;
+
 
 %%
 

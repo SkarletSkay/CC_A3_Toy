@@ -6,7 +6,7 @@
 
 %%
 
-[ \t]+   ;
+[ \t]+      ;
 [\n]+      ;
 
 "("        return LPAREN;
@@ -25,7 +25,7 @@
 "print"    return PRINT;
 "null"     return NULLVAL;
 "new"      return NEW;
-"int"      return INT
+"int"      return INT;
 "real"     return REAL;
 
 "{"        return LBRACE;
@@ -46,9 +46,7 @@
 "-"   return MINUS;
 "*"   return MULTIPLY;
 "/"   return DIVIDE;
-
-[0-9]+      { yylval->NUMBER = atol(yytext); return NUMBER; }
-
-[a-zA-Z][a-zA-Z_0-9]*       { yylval->IDENTIFIER = yytext; return IDENTIFIER; }
+[0-9]+([\.][0-9]+)?      { yylval->NUMBER = atof(yytext); return NUMBER; }
+[a-zA-Z][a-zA-Z_0-9]*      {yylval->IDENTIFIER = yytext; return IDENTIFIER; }
 
 <<EOF>>    return TOK_EOF;
