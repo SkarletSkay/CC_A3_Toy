@@ -25,7 +25,8 @@
 "print"    return PRINT;
 "null"     return NULLVAL;
 "new"      return NEW;
-((([0-9]+)((e|E)(\+|-)?[0-9]+))|(([0-9]*\.[0-9]+)|([0-9]+\.))((e|E)(\+|-)?[0-9]+)?)(f|F|l|L)? return REAL;
+"int"      return INT
+"real"     return REAL;
 
 "{"        return LBRACE;
 "}"        return RBRACE;
@@ -46,7 +47,7 @@
 "*"   return MULTIPLY;
 "/"   return DIVIDE;
 
-[0-9]+      { yylval->INT = atol(yytext); return INT; }
+[0-9]+      { yylval->NUMBER = atol(yytext); return NUMBER; }
 
 [a-zA-Z][a-zA-Z_0-9]*       { yylval->IDENTIFIER = yytext; return IDENTIFIER; }
 
