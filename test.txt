@@ -1,2 +1,12 @@
-import mylb;
-import t;
+import mylb ;
+import t ;
+
+public class main ; {
+    int k ;
+    int x ;
+
+    public static void test ( ) { 
+        int z ;
+        z =5+10 ;
+    }
+}
