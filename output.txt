@@ -1,0 +1,86 @@
+Compilation Unit: {
+   Imports: {
+      Import: {Identifier mylb}
+      Imports: {
+         Import: {Identifier t}
+      }
+   }
+
+   Class Declarations: {
+      Class Declaration: {
+         Public
+         Compound Name: {
+            Identifier main
+         }
+         Class Body: {
+            Class Members: {
+               Class Member: {
+                  Method Declaration: {
+                     Visibility: { PUBLIC }
+                     Staticness: { STATIC }
+                     Method Type: {VOID}
+                     Identifier test
+                     Parameters: {}
+                     Body: {
+                        Local Declarations: {
+                           Local Declaration: {
+                              Type: { 
+                                 INT
+                               }
+                              Identifier z
+                           }
+                        }
+                        Statements: {
+                           Statement: {
+                              Assign: {
+                                 Left Part: {
+                                    Compound Name: {
+                                       Identifier z
+                                    }
+                                 }
+                                 Expression: { 
+                                    Term: { 
+                                       Factor: { 
+                                          5.000000
+                                        }
+                                     }
+                                    Terms: { 
+                                       Add: { + }
+                                       Term: { 
+                                          Factor: { 
+                                             10.000000
+                                           }
+                                        }
+                                     }
+                                 }
+                              }
+                           }
+                        }
+                     }
+                  }
+               }
+               Class Members: {
+                  Class Member: {
+                     Field Declaration: {
+                        Type: { 
+                           INT
+                         }
+                        Identifier x
+                     }
+                  }
+                  Class Members: {
+                     Class Member: {
+                        Field Declaration: {
+                           Type: { 
+                              INT
+                            }
+                           Identifier k
+                        }
+                     }
+                  }
+               }
+            }
+         }
+      }
+   }
+}
